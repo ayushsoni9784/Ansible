@@ -1,0 +1,53 @@
+---
+ - hosts : aws 
+   become: true
+   serial: 1
+   tasks :        
+    - name: Add multiple repositories into the same file 
+      yum_repository:
+        name: redhat
+        description: redhat YUM repo
+        file: external_repos
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+        gpgcheck: no
+    
+    - name: install the latest version of Apache
+      yum:
+        name: httpd
+        state: latest
+    
+    - name: install the latest version of firewall
+      yum: 
+        name: firewalld
+        state: latest
+
+    - name: to start and enable  the service of apache 
+      service: 
+        name: httpd
+        state: started
+        enabled: yes
+    
+    - name: to start and enable the service of firewalld
+      service: 
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: to ensure firewalld is configured 
+      firewalld:
+        service: http
+        permanent: yes
+        immediate: yes
+        state: enabled
+  
+    - name: Copy file with owner and permissions
+      copy:
+       src: /home/ayush/index.html
+       dest: /var/www/html
+
+    - name: to reload the service of firewall
+      service:
+       name: firewalld
+       state: reload
+       enabled: yes
+

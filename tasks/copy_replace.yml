@@ -1,0 +1,10 @@
+---
+ - hosts: aws
+   become: true
+   tasks:
+    - name: copying content of a file
+      copy:
+        src: /home/ayush/playbooks/wiki
+        dest: /home/
+
+
