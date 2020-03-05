@@ -1,0 +1,6 @@
+---
+ - hosts : bc
+   tasks : 
+     - name : ping command 
+       ping :
+
