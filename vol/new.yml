@@ -1,0 +1,35 @@
+---
+ - hosts: localhost
+   vars_files:
+    - /home/ayush/playbooks/vol/vars1.yml
+
+   tasks:
+    - ec2_key:
+         name: aws
+         region: ap-south-1
+      register: ec2_key
+
+    - name: saving the key
+      copy: 
+        content: "{{ ec2_key.key.private_key }}" 
+        dest: /home/ayush/Downloads/aws.pem
+        mode: 0600
+      when: ec2_key.changed   
+    - ec2:
+        keypair: aws
+        image: ami-0a74bfeb190bd404f
+        instance_type: t2.micro
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+      register: ec2
+
+    - ec2_vol:
+       instance: "{{ item.id }}"
+       name: mg
+       device_name: /dev/xvdf
+       region: '{{ region }}'
+       volume_size: 5
+       zone: "{{ item.placement }}"
+      loop: "{{ ec2.instances }}"
+  
